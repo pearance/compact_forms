@@ -1,0 +1,55 @@
+diff --git a/CHANGELOG.txt b/CHANGELOG.txt
+diff --git a/compact_forms.admin.inc b/compact_forms.admin.inc
+index c277447..e68eab0 100644
+--- a/compact_forms.admin.inc
++++ b/compact_forms.admin.inc
+@@ -45,7 +45,14 @@ function compact_forms_admin_form() {
+     '#field_suffix' => t('characters'),
+     '#description' => t("If not empty, the size of all text fields in compact forms will be set to the entered size."),
+   );
+-
++  $form['compact_forms_excluded_fields'] = array(
++    '#type' => 'textarea',
++    '#title' => t('Excluded Form Field CSS IDs'),
++    '#rows' => 3,
++    '#cols' => 40,
++    '#default_value' => variable_get('compact_forms_excluded_fields' , ''),
++    '#description' => t('Enter the Form Field CSS IDs of the fields to disable display compact. One per line.'),
++  );
+   return system_settings_form($form);
+ }
+ 
+diff --git a/compact_forms.js b/compact_forms.js
+index 977c0ab..306936a 100644
+--- a/compact_forms.js
++++ b/compact_forms.js
+@@ -21,6 +21,11 @@ $.fn.compactForm = function (stars, colons) {
+       if (!$field.length || !$field.is('input:text,input:password,textarea')) {
+         return;
+       }
++
++      if (Drupal.settings.compactForms.blackList && jQuery.inArray($label.attr('for'), Drupal.settings.compactForms.blackList) != -1) {
++        return;
++      }
++
+       // Store the initial field value, in case the browser is going to
+       // automatically fill it in upon focus.
+       var initial_value = $field.val();
+diff --git a/compact_forms.module b/compact_forms.module
+index 3f9b958..1281a98 100644
+--- a/compact_forms.module
++++ b/compact_forms.module
+@@ -132,11 +132,13 @@ function _compact_forms_include_js($css_ids) {
+   drupal_add_js($path . '/compact_forms.js');
+   drupal_add_css($path . '/compact_forms.css');
+ 
++  $blacklist = preg_split("/\r\n|\n|\r/", variable_get('compact_forms_excluded_fields' , ''));
+   $settings = array(
+     'compactForms' => array(
+       'forms' => $css_ids,
+       'stars' => (int) variable_get('compact_forms_stars', 2),
+       'colons' => (int) variable_get('compact_forms_colons', 0),
++      'blackList' => $blacklist,
+     ),
+   );
+   drupal_add_js($settings, 'setting');
