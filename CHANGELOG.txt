@@ -1,3 +1,8 @@
+Pearance Mod
+------------
+field exclude patch would not apply. So manually applied it. No time to roll a patch so
+putting this module in the custom folder and pulling from git repos.
+
 
 Compact Forms 7.x-1.x, xxxx-xx-xx
 ---------------------------------
